@@ -15,20 +15,6 @@ monthData = pd.read_csv('/Users/agastyamishra/Downloads/US-National-Parks_Use_19
 #intermountain = intermountain.groupby(['ParkName'],as_index=False).sum()
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #average of all the data in monthData per year
 monthData = monthData.groupby(['Year','Region'],as_index=False).sum()
 
@@ -40,42 +26,42 @@ app = Dash()
 
 
 
-
+col = ['Backcountry','RVCampers','TentCampers']
 
 
 app.layout = html.Div([
+    
        
     
     html.Div(children='An interdisciplinary analysis of the National Parks System'),
     dcc.Graph(figure=px.line(yearData, x='Year', y='RecreationVisits', color = 'Region')),
-    dcc.Graph(figure = px.line(monthData, x = 'Year', y = 'TentCampers', color = 'Region' )),
-
     html.Div([
             dcc.Dropdown(
-                
-                'Number of RV Campers',
+                 col,
+                col[0],
                 id='crossfilter-yaxis-column'
             ),
+    dcc.Graph(figure = px.line(monthData, x = 'Year', y = 'TentCampers', color = 'Region' , ),id = 'crossfilter-indicator-line'),
+
+    
 ])
 
 ])
+@callback(
+    Output('crossfilter-indicator-line', 'figure'),
+    Input('crossfilter-yaxis-column', 'value'))
+
+def update_graph( yaxis_column_name):
+
+
+    
+    figure = px.line(monthData, x = 'Year', y = yaxis_column_name, color = 'Region' )
 
 
 
+    figure.update_yaxes(title=yaxis_column_name)
+    return figure
 
-
-
-
-
-
-
-"""  @callback(
-    Output('crossfilter-indicator-scatter', 'figure'),
-    Input('crossfilter-xaxis-column', 'value'),
-    Input('crossfilter-yaxis-column', 'value'),
-    Input('crossfilter-xaxis-type', 'value'),
-    Input('crossfilter-yaxis-type', 'value'),
-    Input('crossfilter-year--slider', 'value')) """
 
 
 #run file 
