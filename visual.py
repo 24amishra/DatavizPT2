@@ -1,119 +1,110 @@
-from dash import Dash, html, dcc, callback, Output, Input, dash_table,dcc
+from dash import Dash, html, dcc, callback, Output, Input, dash_table
 import plotly.express as px
 import pandas as pd
-import pandas as pd
 import matplotlib.pyplot as plt
-
-
-
 import numpy as np
 
 yearData = pd.read_csv('/Users/agastyamishra/Downloads/US-National-Parks_RecreationVisits_1979-2023.csv')
-
 monthData = pd.read_csv('/Users/agastyamishra/Downloads/US-National-Parks_Use_1979-2023_By-Month.csv', delimiter=',', quotechar='"', encoding='utf-8')
 
-#intermountain = yearData[yearData['Region']=='Intermountain']
-#intermountain = intermountain.groupby(['ParkName'],as_index=False).sum()
+# Strip any spaces from region names
 monthData['Region'] = monthData['Region'].str.strip()
 
-intermountain = monthData[monthData['Region'] == 'Intermountain']
-alaska = monthData[monthData['Region'] == 'Alaska']
-midwest= monthData[monthData['Region'] == 'Midwest']
-northeast = monthData[monthData['Region'] == 'Northeast']
-pacwest = monthData[monthData['Region'] == 'Pacific West']
-southeast = monthData[monthData['Region'] == 'Southeast']
+# Split monthData into regions
+regions = {
+    'Intermountain': monthData[monthData['Region'] == 'Intermountain'],
+    'Alaska': monthData[monthData['Region'] == 'Alaska'],
+    'Midwest': monthData[monthData['Region'] == 'Midwest'],
+    'Northeast': monthData[monthData['Region'] == 'Northeast'],
+    'Pacific West': monthData[monthData['Region'] == 'Pacific West'],
+    'Southeast': monthData[monthData['Region'] == 'Southeast']
+}
 
+# Group data by Year and Region
+monthData_grouped = monthData.groupby(['Year', 'Region'], as_index=False).sum()
 
-regions = [intermountain, alaska,midwest,northeast,pacwest,southeast]
-
-#average of all the data in monthData per year
-
-for idx, region in enumerate(regions):
-    regions[idx] = region.groupby(['Year', 'ParkName'], as_index=False).sum()
-
-
-
-
-monthData = monthData.groupby(['Year','Region'],as_index=False).sum()
-
-
-
-#  aggregate data so only one category(total vis) is visible for each year
+# Aggregate the yearData similarly
 yearData = yearData.groupby(['Year', 'Region'], as_index=False).sum()
-
-
-
-
 
 app = Dash()
 
-
-
-
-
 col = ['Backcountry','RVCampers','TentCampers']
 
-
 app.layout = html.Div([
-    
-       
-    
     html.Div(children='An interdisciplinary analysis of the National Parks System'),
-    dcc.Graph(figure=px.line(yearData, x = 'Year', y='RecreationVisits', color = 'Region')),
+    dcc.Graph(
+        figure=px.line(yearData, x='Year', y='RecreationVisits', color='Region'),
+        id='crossfilter-indicator-line'
+    ),
+    dcc.Graph(
+        figure=px.line(
+            monthData_grouped,
+            x='Year',
+            y='TentCampers',
+            color='Region',
+            title='Total Recreation Visits to NP',
+            
+            
+        ),id = 'crossfilter-yaxis'
+    ),
     html.Div([
-            dcc.Dropdown(
-                 col,
-                col[0],
-                id='crossfilter-yaxis-column'
-            ),
-    dcc.Graph(figure = px.line(monthData, x = 'Year', y = 'TentCampers', color = 'Region' ,title = 'Total Recreation Visits to NP' ),id = 'crossfilter-indicator-line'),
-
-    
+        dcc.Dropdown(
+            options=[{'label': col_item, 'value': col_item} for col_item in col],
+            value=col[0],
+            id='crossfilter-yaxis-column'
+        )
+    ]),
     html.Div([
-        dcc.Graph(figure = px.line(alaska,x = 'Year', y = 'RecreationVisits' , color = 'ParkName'))
-
-
-    
-
-    ]), html.Div([
-
-
-
-
-
-
-
-
-
-
-
+        dcc.Graph(id='hover-line-graph')
     ])
-
-
-
-
-
 ])
 
-
-])
 @callback(
-    Output('crossfilter-indicator-line', 'figure'),
-    Input('crossfilter-yaxis-column', 'value'))
+    Output('hover-line-graph', 'figure'),
+    Input('crossfilter-indicator-line', 'hoverData'),
+   
+   
+)
+def update_hover_line_graph(hoverData):
+    # Check if hoverData is not None
+    if hoverData is None:
+        return px.line(title="Hover over a line to see details")
 
-def update_graph( yaxis_column_name):
+    # Extract the region (line) being hovered over
+    curve_number = hoverData['points'][0]['curveNumber']  # Get curveNumber from hoverData
 
-
+    # Get the corresponding Region name using curveNumber
+    trace_regions = monthData_grouped['Region'].unique()
     
-    figure = px.line(monthData, x = 'Year', y = yaxis_column_name, color = 'Region' )
+    # Ensure curveNumber is valid
+    if curve_number < len(trace_regions):
+        region_name = trace_regions[curve_number]
+    else:
+        return px.line(title="Invalid hover data")
 
+    # Filter the data for the specific region
+    filtered_data = monthData[monthData['Region'] == region_name]
+    filtered_data = filtered_data.groupby(['Year', 'Region','ParkName'], as_index=False).sum(numeric_only=True)
+    # Create a new graph for the hovered region
+    fig = px.line(
+        filtered_data,
+        x='Year',
+        y='RecreationVisits',
+        title=f'Total Recreation Visitors in {region_name}',
+        color='ParkName'  # Optional: Show parks within the region
+    )
 
+    return fig
 
+@app.callback(
+    Output('crossfilter-yaxis', 'figure'),
+    Input('crossfilter-yaxis-column', 'value')
+)
+def update_graph(yaxis_column_name):
+    figure = px.line(monthData_grouped, x='Year', y=yaxis_column_name, color='Region')
     figure.update_yaxes(title=yaxis_column_name)
     return figure
 
-
-
-#run file 
+# Run the app
 if __name__ == '__main__':
     app.run(debug=True)
