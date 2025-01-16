@@ -170,7 +170,7 @@ with tabs[1]:
         
 
         st.markdown("A further analysis of the underlying variables is shown in the figure below.")
-        st.image( '/Users/agastyamishra/Documents/dataviz/dataviz/monthly.png',caption = 'A Deeper Look into the Data')
+        st.image( 'monthly.png',caption = 'A Deeper Look into the Data')
         st.markdown("The first plot details the overall trendline of the regression model, along with the possible error bounds for the associated prediction. ")
         st.markdown("The second figure provides an interesting look into the data discrepancies per month. In general, the months June through September lead to an increase in park attendance. The parks continiously lose attendance in every other month.  ")
 
