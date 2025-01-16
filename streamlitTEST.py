@@ -177,7 +177,7 @@ with tabs[1]:
 
         st.subheader("Final Conclusions")
         st.markdown("This interdisplinary analysis of the United States National Parks System combined elements from Geography, Mathamatics, History, and Statistics. The conclusions developed in this dashboard detail the past and future directions of the system overall.")
-        st.markdown('It remains essential to continue to support our National Parks over the coming years to ensure that they continue to thrive over the next few decades. Consider donating or visiting a park near you!')
+        st.markdown('It remains essential to support our National Parks to ensure that they thrive over the next few decades. Consider donating or visiting a park near you!')
         
        
 
