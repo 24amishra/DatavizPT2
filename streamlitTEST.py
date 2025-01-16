@@ -6,8 +6,8 @@ import plotly.graph_objects as go
 
 
 # Load data
-monthData = pd.read_csv('/Users/agastyamishra/Downloads/US-National-Parks_Use_1979-2023_By-Month.csv', delimiter=',', quotechar='"', encoding='utf-8')
-yearData = pd.read_csv('/Users/agastyamishra/Downloads/US-National-Parks_RecreationVisits_1979-2023.csv')
+monthData = pd.read_csv('US-National-Parks_Use_1979-2023_By-Month.csv', delimiter=',', quotechar='"', encoding='utf-8')
+yearData = pd.read_csv('US-National-Parks_RecreationVisits_1979-2023.csv')
 
 # Strip any spaces from region names
 monthData['Region'] = monthData['Region'].str.strip()
