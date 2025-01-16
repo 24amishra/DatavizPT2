@@ -29,26 +29,26 @@ model.fit(df)
 future = model.make_future_dataframe(periods=240, freq='M')  # Forecasting 240 months ahead
 forecast = model.predict(future)
 values = forecast['yhat']
-""" 
+
 #Plot the forecast
 plt.figure(figsize=(10, 6))
 
  # Plot the historical data
-plt.plot(df['ds'], df['y'], label="Historical Data", color="blue")
+#plt.plot(df['ds'], df['y'], label="Historical Data", color="blue")
 
 # Plot the forecasted data
-plt.plot(forecast['ds'], forecast['yhat'], label="Forecasted Data", color="red", linestyle="--")
+#plt.plot(forecast['ds'], forecast['yhat'], label="Forecasted Data", color="red", linestyle="--")
 
 # Add labels and title
-plt.xlabel('Date (Month-Year)')
-plt.ylabel('Recreation Visits')
-plt.title('Recreation Visits Forecast and Historical Data')
-plt.xticks(rotation=45)
-plt.legend()
+#plt.xlabel('Date (Month-Year)')
+#plt.ylabel('Recreation Visits')
+#plt.title('Recreation Visits Forecast and Historical Data')
+#plt.xticks(rotation=45)
+#plt.legend()
 
 # Show the plot
-plt.show() """
+#plt.show() 
 
 #Optionally, plot the forecast components (trends, seasonal effects, etc.)
-#odel.plot_components(forecast)
-#plt.show()  
+model.plot_components(forecast)
+plt.show()  
