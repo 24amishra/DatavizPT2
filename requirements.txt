@@ -1,5 +1,5 @@
 numpy
 pandas
-plotly.express
-matplotlib.pyplot
+plotly
+matplotlib
 prophet
