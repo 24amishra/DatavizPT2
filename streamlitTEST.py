@@ -61,7 +61,7 @@ with tabs[0]:
     st.plotly_chart(fig1, use_container_width=True)
 
     # Interactive hover graph
-    st.subheader("Hover over a line to see details")
+    st.subheader("Sorted by Parks in a Region")
     hover_region = st.selectbox("Select a Region to Explore:", options=monthData_grouped['Region'].unique(), index=0)
     filtered_data = monthData[monthData['Region'] == hover_region]
     filtered_data = filtered_data.groupby(['Year', 'Region', 'ParkName'], as_index=False).sum(numeric_only=True)
